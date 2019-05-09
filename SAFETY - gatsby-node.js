@@ -3,16 +3,13 @@ const path = require('path')
 const { createFilePath } = require('gatsby-source-filesystem')
 const { paginate } = require('gatsby-awesome-pagination')
 
-
-
-
 const getOnlyPublished = edges =>
   _.filter(edges, ({ node }) => node.status === 'publish')
 
 exports.createPages = ({ actions, graphql }) => {
   const { createPage } = actions
 
-  // pages
+// pages
   return graphql(`
     {
       allWordpressPage {
@@ -39,7 +36,7 @@ exports.createPages = ({ actions, graphql }) => {
       // but not in a production build.
 
       const allPages = result.data.allWordpressPage.edges
-
+      
       const pages =
         process.env.NODE_ENV === 'production'
           ? getOnlyPublished(allPages)
@@ -57,19 +54,19 @@ exports.createPages = ({ actions, graphql }) => {
       })
     })
 
-    // posts now 
+// posts now 
     .then(() => graphql(`
-      {
-        allWordpressPost {
-          edges {
-            node {
-              id
-              slug
-              status
+        {
+          allWordpressPost {
+            edges {
+              node {
+                id
+                slug
+                status
+              }
             }
           }
         }
-      }
       `))
     .then(result => {
       if (result.errors) {
@@ -109,64 +106,7 @@ exports.createPages = ({ actions, graphql }) => {
       })
     })
 
-
-    // projects now 
-    .then(() => graphql(`
-    {
-      allWordpressWpProject {
-        edges {
-          node {
-            id
-            slug
-            status
-          }
-        }
-      }
-    }
-    `))
-    .then(result => {
-      if (result.errors) {
-        result.errors.forEach(e => console.error(e.toString()))
-        return Promise.reject(result.errors)
-      }
-
-      const projectTemplate = path.resolve(`./src/templates/project.js`)
-      const projectListTemplate = path.resolve(`./src/templates/projectarchive.js`)
-
-      // In production builds, filter for only published posts.
-      const allProjects = result.data.allWordpressWpProject.edges
-      const projects =
-        process.env.NODE_ENV === 'production'
-          ? getOnlyPublished(allProjects)
-          : allProjects
-
-      // Iterate over the array of projects
-      _.each(projects, ({ node: project }) => {
-        // Create the Gatsby page for each WordPress project
-        createPage({
-          path: `/projects/${project.slug}/`,
-          component: projectTemplate,
-          context: {
-            id: project.id,
-          },
-        })
-      })
-
-
-      // Create a paginated list, e.g., /, /page/2, /page/3
-      paginate({
-        createPage,
-        items: projects,
-        itemsPerPage: 10,
-        pathPrefix: ({ pageNumber }) => (pageNumber === 0 ? `/projects` : `/projects/page`),
-        component: projectListTemplate,
-      })
-
-    })
-
-
-
-    // Categories
+// Categories
     .then(() => graphql(`
         {
           allWordpressCategory(filter: { count: { gt: 0 } }) {
@@ -200,10 +140,10 @@ exports.createPages = ({ actions, graphql }) => {
       })
     })
 
-    // Wordpress tags
+// Wordpress tags
     .then(() => graphql(`
         {
-          allWordpressTag {
+          allWordpressTag(filter: { count: { gt: 0 } }) {
             edges {
               node {
                 id
@@ -213,7 +153,7 @@ exports.createPages = ({ actions, graphql }) => {
             }
           }
         }
-    `))
+      `))
     .then(result => {
       if (result.errors) {
         result.errors.forEach(e => console.error(e.toString()))
@@ -234,8 +174,8 @@ exports.createPages = ({ actions, graphql }) => {
         })
       })
     })
-
-    //  Users 
+    
+//  Users 
     .then(() => graphql(`
         {
           allWordpressWpUsers {
@@ -246,11 +186,11 @@ exports.createPages = ({ actions, graphql }) => {
               }
             }
           }
-        }  
-  `))
+        }
+      `))
     .then(result => {
       if (result.errors) {
-        result.errors.forEach(e => (e.toString()))
+        result.errors.forEach(e => console.error(e.toString()))
         return Promise.reject(result.errors)
       }
 
@@ -268,9 +208,6 @@ exports.createPages = ({ actions, graphql }) => {
     })
 }
 
-
-
-
 exports.onCreateNode = ({ node, actions, getNode }) => {
   const { createNodeField } = actions
 
@@ -283,7 +220,3 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
     })
   }
 }
-
-
-
-

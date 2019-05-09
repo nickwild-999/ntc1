@@ -11,8 +11,7 @@ export const BlogPostTemplate = ({
   title,
   date,
   author,
-}) => {
-  return (
+}) => (
     <section className="section">
       <div className="container content">
         <div className="columns">
@@ -58,12 +57,12 @@ export const BlogPostTemplate = ({
       </div>
     </section>
   )
-}
 
 BlogPostTemplate.propTypes = {
   content: PropTypes.node.isRequired,
   title: PropTypes.string,
 }
+
 
 const BlogPost = ({ data }) => {
   const { wordpressPost: post } = data
@@ -82,14 +81,14 @@ const BlogPost = ({ data }) => {
     </Layout>
   )
 }
-
 BlogPost.propTypes = {
   data: PropTypes.shape({
     markdownRemark: PropTypes.object,
   }),
 }
-
 export default BlogPost
+
+
 
 export const pageQuery = graphql`
   fragment PostFields on wordpress__POST {
